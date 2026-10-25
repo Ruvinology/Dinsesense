@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   DineSense design tokens - hospitality, not enterprise SaaS.
+
+   TWO COLOUR SYSTEMS, KEPT SEPARATE ON PURPOSE:
+
+   1. BRAND chrome - warm cream surfaces, espresso ink, deep herb-green, brass.
+      This is the restaurant's voice: menus, headers, buttons, the star rating.
+
+   2. DATA colours - sentiment stays blue / gray / red and is never themed.
+      Sentiment is a DIVERGING scale (negative <-> positive with neutral in the
+      middle), so it gets two opposed hues and a neutral midpoint. Positive is
+      blue, not green, because red/green is the worst pair for colour-blind
+      readers (~8% of men). Brand green is deliberately kept away from the
+      charts so it can never be mistaken for a data series.
+
+   The sentiment trio was re-validated against this cream surface: all three
+   clear 3:1 contrast, worst colour-blind separation dE 11.1, worst
+   normal-vision separation 18.1.
+--------------------------------------------------------------------------- */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  /* --- brand surfaces: warm, paper-like */
+  --page: #f7f2e9;          /* linen */
+  --surface-1: #fffdf8;     /* menu card */
+  --surface-2: #f2ebdd;     /* recessed / hover */
+
+  /* --- ink */
+  --text-primary: #241b12;  /* espresso */
+  --text-secondary: #5c4d3f;
+  --text-muted: #8d7d6c;
+
+  /* --- lines */
+  --hairline: rgba(36, 27, 18, 0.10);
+  --gridline: #e6dcc9;
+  --baseline: #cdbfa8;
+
+  /* --- brand accents */
+  --herb: #1f4d3f;          /* deep herb green - primary actions, wordmark */
+  --herb-soft: #e6ede9;
+  --brass: #b8862b;         /* stars, small flourishes */
+  --brass-soft: #f6eeda;
+  --clay: #a8462f;          /* warm accent for urgent chrome */
+  --clay-soft: #f9ebe6;
+
+  /* --- DATA: sentiment (diverging). Never themed, never brand-coloured. */
+  --positive: #2a78d6;
+  --neutral: #8a8880;
+  --negative: #c0392b;
+
+  --positive-soft: #e8f1fc;
+  --neutral-soft: #f0eee9;
+  --negative-soft: #fbeae7;
+
+  /* --- status */
+  --status-good: #1f7a3d;
+  --status-warning: #b8862b;
+  --status-critical: #b23127;
+
+  --shadow-card: 0 1px 2px rgba(36, 27, 18, 0.04),
+                 0 4px 16px rgba(36, 27, 18, 0.05);
+  --shadow-lift: 0 2px 6px rgba(36, 27, 18, 0.06),
+                 0 12px 32px rgba(36, 27, 18, 0.08);
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* A serif for headings gives the warmth a menu has and a dashboard usually
+   lacks. Body text stays sans - serif body copy at 13px is hard to read. */
+.display {
+  font-family: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+}
+
+.card-hover {
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-lift);
+  transform: translateY(-1px);
+}
+
+.hairline { border-color: var(--hairline); }
+
+/* A hand-drawn rule under section headings - the sort of flourish a menu has */
+.rule::after {
+  content: '';
+  display: block;
+  width: 34px;
+  height: 2px;
+  margin-top: 8px;
+  border-radius: 2px;
+  background: var(--brass);
+  opacity: 0.55;
+}
+
+.recharts-wrapper:focus,
+.recharts-surface:focus { outline: none; }
+
+::selection { background: #f0e3c4; }
+
+/* Scrollbar, quietly warm rather than default gray */
+* { scrollbar-color: var(--baseline) transparent; scrollbar-width: thin; }

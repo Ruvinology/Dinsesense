@@ -1,0 +1,45 @@
+# DineSense AI - local stack
+#
+#   docker compose up --build
+#
+# API   : http://localhost:8000/docs
+# DB    : localhost:5432  (user/password/db all "dinesense")
+#
+# The trained models must exist in ml/saved_models/ before you build - the
+# image copies them in. Train them first with ml/train_baseline.py.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: dinesense
+      POSTGRES_PASSWORD: dinesense
+      POSTGRES_DB: dinesense
+    ports:
+      - "5432:5432"
+    volumes:
+      - dinesense_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # The API must not start before Postgres is actually accepting queries
+      test: ["CMD-SHELL", "pg_isready -U dinesense -d dinesense"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://dinesense:dinesense@db:5432/dinesense
+      SECRET_KEY: ${SECRET_KEY:-dev-only-secret-not-for-deployment-change-me-now}
+      DEBUG: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  dinesense_pgdata:

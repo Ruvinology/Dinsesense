@@ -1,0 +1,34 @@
+# Data - never commit. The Yelp dataset is ~5 GB and its ToS restricts redistribution.
+data/raw/
+data/processed/
+Yelp-JSON/
+Yelp-JSON.zip
+*.tar
+*.json.gz
+
+# Trained models and artefacts
+ml/saved_models/*.keras
+ml/saved_models/*.joblib
+ml/saved_models/*.h5
+ml/saved_models/*.png
+
+# Keep the metrics JSON - they are small and belong in the repo as evidence
+!ml/saved_models/*_metrics.json
+!ml/saved_models/model_comparison.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+*.env
+
+# Editors
+.idea/
+.vscode/
+.DS_Store

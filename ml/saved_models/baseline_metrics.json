@@ -1,0 +1,27 @@
+{
+  "model": "tfidf_logreg_baseline",
+  "test_accuracy": 0.7714539795464651,
+  "test_macro_f1": 0.7717505913175428,
+  "per_class": {
+    "negative": {
+      "precision": 0.8073949579831933,
+      "recall": 0.8009336445481827,
+      "f1-score": 0.8041513223970539,
+      "support": 2999.0
+    },
+    "neutral": {
+      "precision": 0.6703984194929207,
+      "recall": 0.6791194129419613,
+      "f1-score": 0.6747307373653687,
+      "support": 2998.0
+    },
+    "positive": {
+      "precision": 0.8384718498659517,
+      "recall": 0.8342780926975658,
+      "f1-score": 0.8363697141902056,
+      "support": 2999.0
+    }
+  },
+  "n_train": 41977,
+  "n_test": 8996
+}

@@ -1,0 +1,38 @@
+{
+  "model": "bilstm_v2_glove",
+  "model_version": "v2",
+  "test_accuracy": 0.7514450867052023,
+  "test_macro_f1": 0.7543506533946531,
+  "per_class": {
+    "negative": {
+      "precision": 0.8144812680115274,
+      "recall": 0.7539179726575526,
+      "f1-score": 0.7830303030303031,
+      "support": 2999.0
+    },
+    "neutral": {
+      "precision": 0.6265450264861684,
+      "recall": 0.710140093395597,
+      "f1-score": 0.6657285803627268,
+      "support": 2998.0
+    },
+    "positive": {
+      "precision": 0.8398299078667611,
+      "recall": 0.7902634211403802,
+      "f1-score": 0.8142930767909294,
+      "support": 2999.0
+    }
+  },
+  "epochs_run": 15,
+  "trainable_params": 92931,
+  "frozen_params": 2000000,
+  "n_train": 41977,
+  "n_test": 8996,
+  "changes_from_v1": [
+    "frozen GloVe 100d embeddings instead of learned 128d",
+    "sequence length 200 -> 160",
+    "dropout 0.4/0.3 -> 0.3 (LSTM) / 0.5 / 0.3",
+    "L2 1e-4 on the dense layer",
+    "balanced class weights"
+  ]
+}

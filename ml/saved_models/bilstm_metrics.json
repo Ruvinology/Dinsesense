@@ -1,0 +1,29 @@
+{
+  "model": "bilstm_sentiment",
+  "model_version": "v1",
+  "test_accuracy": 0.7517785682525567,
+  "test_macro_f1": 0.7483154601592107,
+  "per_class": {
+    "negative": {
+      "precision": 0.775984506132989,
+      "recall": 0.8016005335111704,
+      "f1-score": 0.7885845497785796,
+      "support": 2999.0
+    },
+    "neutral": {
+      "precision": 0.6710526315789473,
+      "recall": 0.595396931287525,
+      "f1-score": 0.630965005302227,
+      "support": 2998.0
+    },
+    "positive": {
+      "precision": 0.794935145151328,
+      "recall": 0.8582860953651217,
+      "f1-score": 0.8253968253968254,
+      "support": 2999.0
+    }
+  },
+  "epochs_run": 4,
+  "n_train": 41977,
+  "n_test": 8996
+}
