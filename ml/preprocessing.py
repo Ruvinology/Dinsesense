@@ -12,9 +12,13 @@ from __future__ import annotations
 import html
 import re
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-import pandas as pd
-from sklearn.model_selection import train_test_split
+# pandas and scikit-learn are imported inside the functions that need them.
+# The deployed API only uses clean_text() and the label maps, so it doesn't
+# have to install or load either library.
+if TYPE_CHECKING:
+    import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROCESSED_CSV = PROJECT_ROOT / "data" / "processed" / "restaurant_reviews.csv"
@@ -48,6 +52,8 @@ def clean_text(text: str) -> str:
 
 def load_dataset(csv_path: Path | str = PROCESSED_CSV) -> pd.DataFrame:
     """Load the prepared CSV, clean the text, drop empties and duplicates."""
+    import pandas as pd
+
     csv_path = Path(csv_path)
     if not csv_path.exists():
         raise FileNotFoundError(
@@ -70,6 +76,8 @@ def load_dataset(csv_path: Path | str = PROCESSED_CSV) -> pd.DataFrame:
 
 def split_dataset(df: pd.DataFrame, test_size: float = 0.15, val_size: float = 0.15):
     """Stratified train/validation/test split. Returns three DataFrames."""
+    from sklearn.model_selection import train_test_split
+
     train_val, test = train_test_split(
         df, test_size=test_size, stratify=df["label"], random_state=RANDOM_SEED
     )

@@ -4,8 +4,8 @@ A restaurant feedback intelligence platform: it ingests reviews, analyses them
 with a deep-learning sentiment model plus aspect and urgency detection, and
 surfaces the results as business actions on a manager dashboard.
 
-**Status: ML pipeline, FastAPI backend and React dashboard all built and running
-locally. Not yet deployed.**
+**Status: ML pipeline, FastAPI backend and React dashboard all built. Set up to
+deploy on Vercel (frontend, API and Neon Postgres) - see "Deploying on Vercel".**
 
 ---
 
@@ -22,9 +22,9 @@ locally. Not yet deployed.**
 | Urgency detection | v1, rule-based |
 | Recommendation engine | v1, mapped from aspects |
 | FastAPI backend | Built, with tests |
-| Database | SQLite locally; PostgreSQL supported via `DATABASE_URL` |
+| Database | SQLite locally; PostgreSQL via `DATABASE_URL` (Neon on Vercel) |
 | React dashboard | Built |
-| Deployment | Not started (Docker files exist) |
+| Deployment | Configured for Vercel (`vercel.json`, `server.py`); Docker files also exist |
 
 ---
 
@@ -62,13 +62,16 @@ What happened, briefly:
 ```bash
 python -m venv .venv
 .venv\Scripts\activate            # Windows
-pip install -r requirements.txt
-pip install -r backend/requirements.txt
+pip install -r requirements.txt           # what the API needs to run
+pip install -r backend/requirements.txt   # uvicorn and test tools, for local dev
+pip install -r requirements-train.txt     # only if you train models or use the notebooks
 ```
 
-Serving the transformer needs only `onnxruntime` and `tokenizers` (both in
-`requirements.txt`), not PyTorch. TensorFlow is only needed if you want to serve
-or retrain the BiLSTMs.
+`requirements.txt` is deliberately lean, because Vercel installs it for the
+deployed API and has a 500 MB limit. Serving the transformer needs only
+`onnxruntime` and `tokenizers`, not PyTorch. TensorFlow, pandas and
+scikit-learn are in `requirements-train.txt`, needed only to prepare data,
+retrain the baseline or BiLSTMs, or serve the BiLSTMs.
 
 TensorFlow on native Windows is CPU-only from 2.11 onwards. Training the BiLSTM
 on 42,000 reviews takes a few minutes per epoch on a laptop CPU.
@@ -166,6 +169,56 @@ cd backend && python -m pytest tests/
 
 ---
 
+## Deploying on Vercel
+
+Two Vercel projects are imported from the same GitHub repository:
+
+| Project | Root Directory | What it runs |
+|---|---|---|
+| API | `./` (repo root) | FastAPI as a Vercel Function, entry point `server.py`, packages from `requirements.txt` |
+| Frontend | `frontend` | The Vite build, served from Vercel's CDN (`frontend/vercel.json` handles page refreshes) |
+
+The API deploys from the repo root, not `backend/`, so the model and
+`predict.py` in `ml/` are part of the deployment. `vercel.json` at the root
+leaves training scripts, notebooks, images and the frontend out of the bundle.
+
+**Database.** A Vercel Function's disk isn't kept between instances, so SQLite
+can't store data there. Add Neon Postgres from the API project's Storage tab;
+it sets `DATABASE_URL`, which the backend reads automatically. (The backend
+converts Neon's `postgresql://` address to the psycopg 3 driver itself.)
+
+**Environment variables (API project)**
+
+| Name | Value |
+|---|---|
+| `DATABASE_URL` | Set by the Neon integration |
+| `SECRET_KEY` | A new random value: `python -c "import secrets; print(secrets.token_urlsafe(48))"` |
+| `CORS_ORIGINS` | `["https://<your-frontend>.vercel.app"]` (JSON list) |
+
+**Environment variable (Frontend project):** `VITE_API_URL` =
+`https://<your-api>.vercel.app`, no trailing slash. Redeploy the frontend
+after changing it, because Vite bakes it in at build time.
+
+**Demo data.** Tables are created automatically on the API's first start. To
+add the demo restaurant and logins, run the seed script once from your laptop
+against the Neon database:
+
+```powershell
+$env:DATABASE_URL = "<DATABASE_URL from Vercel>"
+cd backend
+python seed.py
+```
+
+Things to know:
+
+- The first request after a quiet period starts a fresh instance and loads the
+  model, which takes a few seconds. Later requests are fast.
+- The demo logins and their password are shown on the login page. On a public
+  deployment anyone can sign in as admin. Change the password, or remove the
+  hint, if that matters for your demo.
+
+---
+
 ## Design notes worth knowing
 
 **Labels come from star ratings.** 1-2 stars = negative, 3 = neutral, 4-5 =
@@ -221,7 +274,10 @@ DineSense/
 ├── backend/                    # FastAPI + SQLAlchemy
 ├── frontend/                   # React + Vite + Tailwind
 ├── tests/
-└── requirements.txt
+├── server.py                   # Vercel entry point for the API
+├── vercel.json                 # Vercel settings for the API project
+├── requirements.txt            # lean: what the deployed API needs
+└── requirements-train.txt      # training and notebook libraries
 ```
 
 ---

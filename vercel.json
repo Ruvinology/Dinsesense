@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "server.py": {
+      "maxDuration": 60,
+      "excludeFiles": "{frontend/**,notebooks/**,tests/**,backend/tests/**,data/**,_backup_*/**,**/__pycache__/**,backend/*.db,docker-compose.yml,ml/train_*.py,ml/prepare_data.py,ml/evaluate.py,ml/compare_models.py,ml/saved_models/*.part*,ml/saved_models/*.png,ml/saved_models/REJOIN_MODEL.md,ml/saved_models/transformer_v3/*.png,ml/saved_models/transformer_v3/model.safetensors}"
+    }
+  }
+}

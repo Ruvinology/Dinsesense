@@ -14,7 +14,14 @@ class Base(DeclarativeBase):
     """Base class every ORM model inherits from."""
 
 
-connect_args = {"check_same_thread": False} if settings.is_sqlite else {}
+if settings.is_sqlite:
+    connect_args = {"check_same_thread": False}
+else:
+    # Hosted Postgres usually sits behind a connection pooler (Neon's pooled
+    # DATABASE_URL is PgBouncer). psycopg 3 prepares repeated queries on the
+    # server by default, which a transaction-mode pooler can't track, so turn
+    # automatic prepared statements off.
+    connect_args = {"prepare_threshold": None}
 
 engine = create_engine(
     settings.database_url,

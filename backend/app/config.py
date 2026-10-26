@@ -5,6 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -44,6 +45,18 @@ class Settings(BaseSettings):
 
     # Batch upload guard rail
     max_batch_rows: int = 5_000
+
+    @field_validator("database_url")
+    @classmethod
+    def _use_psycopg3_driver(cls, url: str) -> str:
+        """Hosted Postgres (Neon on Vercel, Railway, Render...) hands out plain
+        postgres:// or postgresql:// URLs. SQLAlchemy reads those as "use
+        psycopg2", but this project installs psycopg 3, so name it explicitly."""
+        if url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://"):]
+        if url.startswith("postgresql://"):
+            url = "postgresql+psycopg://" + url[len("postgresql://"):]
+        return url
 
     @property
     def is_sqlite(self) -> bool:
