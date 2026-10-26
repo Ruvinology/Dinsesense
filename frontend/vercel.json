@@ -1,4 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://dinsesense.vercel.app/api/:path*" },
+    { "source": "/health", "destination": "https://dinsesense.vercel.app/health" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

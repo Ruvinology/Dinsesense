@@ -6,7 +6,14 @@
  * changes.
  */
 
-const BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+// Where API calls go:
+// - Production build (Vercel): '' - the browser calls /api/... on the site's own
+//   address and frontend/vercel.json forwards it to the API project. One origin,
+//   so the browser never makes a cross-site (CORS) request.
+// - `npm run dev`: VITE_API_URL if set, otherwise the local backend on port 8000.
+const BASE = import.meta.env.PROD
+  ? ''
+  : (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000')
 
 const TOKEN_KEY = 'dinesense_token'
 
@@ -53,7 +60,7 @@ async function request(path, { method = 'GET', body, auth = true, isForm = false
   } catch {
     // fetch only rejects on network failure, not on 4xx/5xx
     throw new ApiError(
-      'Cannot reach the API. Is the backend running on ' + BASE + '?',
+      'Cannot reach the API. Is the backend running on ' + (BASE || window.location.origin) + '?',
       0,
     )
   }
