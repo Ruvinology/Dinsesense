@@ -295,4 +295,8 @@ def test_model_metrics_public(client):
     body = client.get("/api/model/metrics").json()
     # These are the registry keys in ml/predict.py - if that list changes, this
     # test should fail so the two stay in step.
-    assert body["active_model"] in {"bilstm_v2", "bilstm_v1", "baseline", "none"}
+    assert body["active_model"] in {"transformer_v3", "bilstm_v2", "bilstm_v1", "baseline", "none"}
+    # The version must describe the model actually serving, not a hard-coded label.
+    expected_version = {"transformer_v3": "v3", "bilstm_v2": "v2", "bilstm_v1": "v1",
+                        "baseline": "baseline", "none": "none"}[body["active_model"]]
+    assert body["model_version"] == expected_version

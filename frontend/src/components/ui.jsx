@@ -8,7 +8,7 @@ const SENTIMENT_STYLE = {
 
 const URGENCY_STYLE = {
   low: { bg: 'var(--neutral-soft)', fg: 'var(--text-secondary)', icon: '○', label: 'Low' },
-  medium: { bg: 'var(--brass-soft)', fg: '#7a5a17', icon: '◑', label: 'Medium' },
+  medium: { bg: 'var(--brass-soft)', fg: '#7a5410', icon: '◑', label: 'Medium' },
   high: { bg: 'var(--clay-soft)', fg: '#8f2b20', icon: '◉', label: 'High' },
 }
 
@@ -115,7 +115,7 @@ export function Button({ variant = 'primary', className = '', ...props }) {
     'inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium ' +
     'transition disabled:cursor-not-allowed disabled:opacity-50'
   const styles = {
-    primary: { background: 'var(--herb)', color: '#fffdf8' },
+    primary: { background: 'var(--herb)', color: 'var(--on-brand)' },
     ghost: { background: 'transparent', color: 'var(--text-secondary)',
              border: '1px solid var(--hairline)' },
   }
@@ -140,8 +140,8 @@ export function Field({ label, hint, children }) {
 
 export const inputClass =
   'w-full rounded-xl border px-3.5 py-2.5 text-sm outline-none hairline ' +
-  'bg-white/70 focus:bg-white focus:border-[#1f4d3f] focus:ring-2 focus:ring-[#1f4d3f]/15 ' +
-  'transition placeholder:text-[#a3927e]'
+  'bg-white/70 focus:bg-white focus:border-[#1d6142] focus:ring-2 focus:ring-[#1d6142]/15 ' +
+  'transition placeholder:text-[#8a9b8f]'
 
 export const ASPECT_LABELS = {
   food_quality: 'Food quality',

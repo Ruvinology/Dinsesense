@@ -8,7 +8,7 @@ function Nav({ to, children }) {
       end
       className="relative px-1 py-3 text-sm font-medium transition"
       style={({ isActive }) => ({
-        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+        color: isActive ? 'var(--header-ink)' : 'var(--header-muted)',
       })}
     >
       {({ isActive }) => (
@@ -16,7 +16,7 @@ function Nav({ to, children }) {
           {children}
           <span
             className="absolute inset-x-0 -bottom-px h-[2px] rounded-full transition-opacity"
-            style={{ background: 'var(--brass)', opacity: isActive ? 1 : 0 }}
+            style={{ background: 'var(--header-accent)', opacity: isActive ? 1 : 0 }}
             aria-hidden="true"
           />
         </>
@@ -32,25 +32,20 @@ export default function Layout() {
   return (
     <div className="min-h-full">
       <header
-        className="sticky top-0 z-20 border-b hairline backdrop-blur"
-        style={{ background: 'rgba(255, 253, 248, 0.92)' }}
+        className="sticky top-0 z-20 border-b"
+        style={{ background: 'var(--header)', borderColor: 'var(--header-line)' }}
       >
         <div className="mx-auto flex max-w-7xl items-center gap-8 px-6">
           <NavLink to="/" className="flex items-center gap-2.5 py-3">
             <span
               className="grid h-9 w-9 place-items-center rounded-full text-xs font-bold"
-              style={{ background: 'var(--herb)', color: '#fffdf8' }}
+              style={{ background: 'var(--header-accent)', color: 'var(--header)' }}
               aria-hidden="true"
             >
               DS
             </span>
-            <span className="leading-tight">
-              <span className="display block text-[15px] font-semibold">DineSense</span>
-              <span className="block text-[10px] uppercase tracking-[0.16em]"
-                    style={{ color: 'var(--text-muted)' }}>
-                Guest Intelligence
-              </span>
-            </span>
+            <span className="display text-[17px] font-semibold leading-tight"
+                  style={{ color: 'var(--header-ink)' }}>DineSense</span>
           </NavLink>
 
           <nav className="flex items-center gap-6">
@@ -64,27 +59,28 @@ export default function Layout() {
             <NavLink
               to="/submit"
               className="rounded-full border px-3.5 py-1.5 text-xs font-medium transition
-                         hairline hover:bg-black/[0.03]"
-              style={{ color: 'var(--text-secondary)' }}
+                         hover:bg-white/10"
+              style={{ color: 'var(--header-ink)', borderColor: 'var(--header-line)' }}
             >
               Guest feedback page
             </NavLink>
 
             {user && (
-              <div className="flex items-center gap-3 border-l pl-4 hairline">
+              <div className="flex items-center gap-3 border-l pl-4"
+                   style={{ borderColor: 'var(--header-line)' }}>
                 <span
                   className="grid h-8 w-8 place-items-center rounded-full text-xs font-semibold"
-                  style={{ background: 'var(--surface-2)', color: 'var(--text-secondary)' }}
+                  style={{ background: 'var(--header-line)', color: 'var(--header-ink)' }}
                   aria-hidden="true"
                 >
                   {user.name.split(' ').map((p) => p[0]).slice(0, 2).join('')}
                 </span>
                 <div className="leading-tight">
-                  <p className="text-xs font-medium">{user.name}</p>
+                  <p className="text-xs font-medium" style={{ color: 'var(--header-ink)' }}>{user.name}</p>
                   <button
                     onClick={() => { logout(); navigate('/login') }}
                     className="text-[11px] underline"
-                    style={{ color: 'var(--text-muted)' }}
+                    style={{ color: 'var(--header-muted)' }}
                   >
                     Sign out
                   </button>
@@ -101,7 +97,7 @@ export default function Layout() {
 
       <footer className="mx-auto max-w-7xl px-6 pb-8 pt-2">
         <p className="text-center text-[11px]" style={{ color: 'var(--text-muted)' }}>
-          DineSense AI · sentiment, aspects and urgency from guest feedback
+          Developed and designed by Ruim Palihawadana
         </p>
       </footer>
     </div>

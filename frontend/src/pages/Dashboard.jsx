@@ -79,7 +79,7 @@ export default function Dashboard() {
               onClick={() => setDays(range.days)}
               className="rounded-full px-3.5 py-1.5 text-xs font-medium transition"
               style={days === range.days
-                ? { background: 'var(--herb)', color: '#fffdf8' }
+                ? { background: 'var(--herb)', color: 'var(--on-brand)' }
                 : { color: 'var(--text-secondary)' }}
             >
               {range.label}
@@ -88,12 +88,49 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* --- Urgent first. A manager needs to know about raw chicken before
-             they need to know the sentiment split. */}
+      {/* --- the numbers */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatTile label="Guest reviews" value={summary.total_reviews} icon="✉" />
+        <StatTile
+          label="Urgent"
+          value={urgent}
+          icon="!"
+          accent={urgent > 0 ? 'var(--clay)' : undefined}
+          hint={urgent > 0 ? 'Needs a response today' : 'Nothing outstanding'}
+        />
+        <StatTile
+          label="Negative share"
+          value={`${negativeShare}%`}
+          icon="◔"
+          hint={`${summary.sentiment.negative} of ${analysed} analysed`}
+        />
+        <StatTile
+          label="Average rating"
+          value={summary.average_star_rating ?? '—'}
+          icon="★"
+          accent={summary.average_star_rating ? 'var(--brass)' : undefined}
+          hint={summary.average_star_rating ? 'out of 5 stars' : 'No ratings given'}
+        />
+      </div>
+
+      {/* --- sentiment + complaints */}
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <Card title="How guests feel" subtitle="Across every analysed review">
+          <SentimentSplit counts={summary.sentiment} />
+        </Card>
+
+        <Card title="What they complain about"
+              subtitle="Aspects mentioned negatively, most frequent first">
+          <AspectChart data={aspects} />
+        </Card>
+      </div>
+
+      {/* --- the guest comments that need a reply. The urgent count is already in
+             the tiles at the top, so the full list can follow the charts. */}
       <section
         className="overflow-hidden rounded-[14px] border"
         style={{
-          borderColor: urgent > 0 ? 'rgba(168,70,47,0.28)' : 'var(--hairline)',
+          borderColor: urgent > 0 ? 'rgba(181,64,42,0.28)' : 'var(--hairline)',
           background: 'var(--surface-1)',
           boxShadow: 'var(--shadow-card)',
         }}
@@ -110,7 +147,7 @@ export default function Dashboard() {
               className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm"
               style={{
                 background: urgent > 0 ? 'var(--clay)' : 'var(--surface-2)',
-                color: urgent > 0 ? '#fffdf8' : 'var(--text-muted)',
+                color: urgent > 0 ? 'var(--on-brand)' : 'var(--text-muted)',
               }}
               aria-hidden="true"
             >
@@ -150,43 +187,6 @@ export default function Dashboard() {
           </ul>
         )}
       </section>
-
-      {/* --- the numbers */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile label="Guest reviews" value={summary.total_reviews} icon="✉" />
-        <StatTile
-          label="Urgent"
-          value={urgent}
-          icon="!"
-          accent={urgent > 0 ? 'var(--clay)' : undefined}
-          hint={urgent > 0 ? 'Needs a response today' : 'Nothing outstanding'}
-        />
-        <StatTile
-          label="Negative share"
-          value={`${negativeShare}%`}
-          icon="◔"
-          hint={`${summary.sentiment.negative} of ${analysed} analysed`}
-        />
-        <StatTile
-          label="Average rating"
-          value={summary.average_star_rating ?? '—'}
-          icon="★"
-          accent={summary.average_star_rating ? 'var(--brass)' : undefined}
-          hint={summary.average_star_rating ? 'out of 5 stars' : 'No ratings given'}
-        />
-      </div>
-
-      {/* --- sentiment + complaints */}
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <Card title="How guests feel" subtitle="Across every analysed review">
-          <SentimentSplit counts={summary.sentiment} />
-        </Card>
-
-        <Card title="What they complain about"
-              subtitle="Aspects mentioned negatively, most frequent first">
-          <AspectChart data={aspects} />
-        </Card>
-      </div>
 
       <Card title="Sentiment over time" subtitle={`Daily, last ${days} days`}>
         <TrendChart data={trends} />

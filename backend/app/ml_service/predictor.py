@@ -91,6 +91,19 @@ def active_model_name() -> str:
         return "none"
 
 
+def active_model_version() -> str:
+    """Version label ("v3", "v2", ...) of the model that would serve right now.
+
+    Delegates to ml/predict.py for the same reason as active_model_name().
+    """
+    try:
+        _import_ml()
+        from predict import active_model_version as _version  # type: ignore
+        return _version()
+    except Exception:  # noqa: BLE001 - never let a status endpoint raise
+        return "none"
+
+
 def read_metrics() -> dict[str, Any]:
     """Load whatever metrics files exist so the dashboard can show them."""
     out: dict[str, Any] = {}
@@ -98,8 +111,13 @@ def read_metrics() -> dict[str, Any]:
     for key, filename in (
         ("baseline", "baseline_metrics.json"),
         ("bilstm", "bilstm_metrics.json"),
+        ("bilstm_v2", "bilstm_v2_metrics.json"),
+        ("transformer_v3", "transformer_v3/transformer_v3_metrics.json"),
+        ("transformer_v3_int8", "transformer_v3/onnx_int8_metrics.json"),
         ("comparison", "model_comparison.json"),
         ("history", "bilstm_history.json"),
+        ("history_bilstm_v2", "bilstm_v2_history.json"),
+        ("history_transformer_v3", "transformer_v3/transformer_v3_history.json"),
     ):
         path = saved / filename
         if path.exists():

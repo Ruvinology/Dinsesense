@@ -1,0 +1,38 @@
+{
+  "model": "distilroberta_finetuned",
+  "model_version": "v3",
+  "base_model": "distilbert/distilroberta-base",
+  "test_accuracy": 0.8190306803023566,
+  "test_macro_f1": 0.8206892470795464,
+  "per_class": {
+    "negative": {
+      "precision": 0.8562023562023562,
+      "recall": 0.8239413137712571,
+      "f1-score": 0.8397621070518266,
+      "support": 2999.0
+    },
+    "neutral": {
+      "precision": 0.7148125384142594,
+      "recall": 0.7758505670446965,
+      "f1-score": 0.7440818937939859,
+      "support": 2998.0
+    },
+    "positive": {
+      "precision": 0.9002100840336135,
+      "recall": 0.8572857619206402,
+      "f1-score": 0.8782237403928267,
+      "support": 2999.0
+    }
+  },
+  "best_epoch": 2.0,
+  "epochs_run": 3,
+  "best_val_macro_f1": 0.8189720531940602,
+  "max_len": 256,
+  "batch_size": 32,
+  "learning_rate": 2e-05,
+  "trainable_params": 82120707,
+  "n_train": 41977,
+  "n_test": 8996,
+  "smoke_test": false,
+  "trained_on": "Tesla T4"
+}

@@ -1,10 +1,27 @@
 {
-  "baseline_tfidf_logreg": {
+  "baseline": {
     "accuracy": 0.7714539795464651,
-    "macro_f1": 0.7717505913175428
+    "macro_f1": 0.7717505913175428,
+    "note": "TF-IDF + logistic regression"
   },
-  "bilstm": {
+  "bilstm_v1": {
     "accuracy": 0.7517785682525567,
-    "macro_f1": 0.7483154601592107
+    "macro_f1": 0.7483154601592107,
+    "note": "BiLSTM, learned embeddings"
+  },
+  "bilstm_v2": {
+    "accuracy": 0.7514450867052023,
+    "macro_f1": 0.7543506533946531,
+    "note": "BiLSTM, frozen GloVe embeddings"
+  },
+  "transformer_v3": {
+    "accuracy": 0.8168074699866608,
+    "macro_f1": 0.818341306499445,
+    "note": "DistilRoBERTa fine-tuned, 8-bit ONNX (the version the app serves)"
+  },
+  "transformer_v3_fp32": {
+    "accuracy": 0.8190306803023566,
+    "macro_f1": 0.8206892470795464,
+    "note": "DistilRoBERTa fine-tuned, full precision (Colab result)"
   }
 }

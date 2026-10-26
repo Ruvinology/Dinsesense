@@ -7,7 +7,8 @@ once and reuses it.
     python ml/predict.py "The food was excellent but the service was very slow."
 
 Honest labelling of what is what:
-  - sentiment  : learned (BiLSTM, or the baseline as fallback)
+  - sentiment  : learned (fine-tuned DistilRoBERTa by default; the BiLSTMs and
+                 the baseline remain available as fallbacks)
   - aspects    : keyword-matched, with sentiment scored from the surrounding
                  clause. Transparent and debuggable, but NOT a trained model.
                  Version 2 should replace this with a multi-label classifier.
@@ -18,6 +19,8 @@ Honest labelling of what is what:
 
 from __future__ import annotations
 
+import html
+import json
 import os
 import re
 import sys
@@ -32,16 +35,22 @@ MODEL_DIR = Path(__file__).resolve().parent / "saved_models"
 # Every model the app knows how to serve, in preference order. The first one
 # whose file exists wins, unless DINESENSE_MODEL names one explicitly.
 #
-#   key            file                            kind        test macro F1
-#   bilstm_v2      bilstm_v2_sentiment.keras       keras       0.7544
-#   bilstm_v1      bilstm_sentiment.keras          keras       0.7483
-#   baseline       baseline_tfidf_logreg.joblib    sklearn     0.7718
+#   key             file                                 kind     test macro F1
+#   transformer_v3  transformer_v3/sentiment_int8.onnx   onnx     0.8207 full precision
+#                                                                 (0.8183 as served, 8-bit)
+#   bilstm_v2       bilstm_v2_sentiment.keras            keras    0.7544
+#   bilstm_v1       bilstm_sentiment.keras               keras    0.7483
+#   baseline        baseline_tfidf_logreg.joblib         sklearn  0.7718
 #
-# NOTE FOR THE REPORT: the baseline scores HIGHEST. bilstm_v2 is served by
-# default because this is a deep-learning project and the deep model is the
-# subject of the work - not because it is the most accurate. Setting
-# DINESENSE_MODEL=baseline switches to the better-scoring model.
+# All four are scored on the same 8,996 test reviews. The baseline beat both
+# BiLSTMs; the fine-tuned transformer is the first deep model to beat it, so it
+# is served by default. It was fine-tuned in notebooks/finetune_transformer_v3.ipynb
+# (Colab GPU), then exported to ONNX and quantised to 8-bit: 83 MB instead of
+# 330 MB, and it needs only the light onnxruntime + tokenizers packages, not
+# PyTorch. DINESENSE_MODEL=<key> forces any other model.
 MODEL_REGISTRY = [
+    {"key": "transformer_v3", "file": "transformer_v3/sentiment_int8.onnx", "kind": "onnx",
+     "version": "v3"},
     {"key": "bilstm_v2", "file": "bilstm_v2_sentiment.keras", "kind": "keras", "version": "v2"},
     {"key": "bilstm_v1", "file": "bilstm_sentiment.keras", "kind": "keras", "version": "v1"},
     {"key": "baseline", "file": "baseline_tfidf_logreg.joblib", "kind": "sklearn",
@@ -51,6 +60,8 @@ MODEL_REGISTRY = [
 BASELINE_PATH = MODEL_DIR / "baseline_tfidf_logreg.joblib"
 
 MODEL_VERSION = "v1"  # overwritten at load time by the model actually selected
+
+TRANSFORMER_MAX_LEN = 256  # must match MAX_LEN in the fine-tuning notebook
 
 # --------------------------------------------------------------------------
 # Aspect vocabulary
@@ -211,6 +222,11 @@ class PredictionResult:
 # Model loading
 # --------------------------------------------------------------------------
 
+def _onnx_runtime_available() -> bool:
+    import importlib.util
+    return all(importlib.util.find_spec(m) is not None for m in ("onnxruntime", "tokenizers"))
+
+
 def _select_entry() -> dict:
     """Decide which model to serve.
 
@@ -235,8 +251,15 @@ def _select_entry() -> dict:
         return match
 
     for entry in MODEL_REGISTRY:
-        if (MODEL_DIR / entry["file"]).exists():
-            return entry
+        if not (MODEL_DIR / entry["file"]).exists():
+            continue
+        if entry["kind"] == "onnx" and not _onnx_runtime_available():
+            # Fall back rather than fail: a missing package should not take
+            # sentiment analysis down.
+            print(f"[predict] {entry['key']} found but onnxruntime/tokenizers are not "
+                  "installed - falling back. Fix: pip install onnxruntime tokenizers")
+            continue
+        return entry
 
     raise FileNotFoundError(
         "No trained model found in "
@@ -254,7 +277,9 @@ def _load_model():
     path = MODEL_DIR / entry["file"]
     MODEL_VERSION = entry["version"]
 
-    if entry["kind"] == "keras":
+    if entry["kind"] == "onnx":
+        model = _load_onnx(path)
+    elif entry["kind"] == "keras":
         from tensorflow import keras
         model = keras.models.load_model(path)
     else:
@@ -265,6 +290,27 @@ def _load_model():
     return (entry["kind"], entry["key"], model)
 
 
+def _load_onnx(path: Path):
+    """Load an ONNX sentiment model and the tokenizer saved next to it."""
+    import onnxruntime as ort
+    from tokenizers import Tokenizer
+
+    folder = path.parent
+    config = json.loads((folder / "config.json").read_text(encoding="utf-8"))
+    labels = {int(i): label for i, label in config["id2label"].items()}
+    if labels != ID_TO_LABEL:
+        raise ValueError(
+            f"{folder.name} was trained with labels {labels}, but preprocessing.LABELS "
+            f"gives {ID_TO_LABEL}. The output order must match."
+        )
+
+    tokenizer = Tokenizer.from_file(str(folder / "tokenizer.json"))
+    tokenizer.enable_truncation(max_length=TRANSFORMER_MAX_LEN)
+    tokenizer.no_padding()
+    session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    return session, tokenizer
+
+
 def active_model_key() -> str:
     """Which model is serving. Safe to call before anything is loaded."""
     try:
@@ -273,8 +319,43 @@ def active_model_key() -> str:
         return "none"
 
 
+def active_model_version() -> str:
+    """Version label of the serving model ("v3", "v2", ...). Safe before loading."""
+    try:
+        return _select_entry()["version"]
+    except (FileNotFoundError, ValueError):
+        return "none"
+
+
+_WHITESPACE = re.compile(r"\s+")
+
+
+def _raw_text(text: str) -> str:
+    """Light cleanup for the transformer, which was trained on raw review text.
+
+    Unlike clean_text() this keeps capitals, emoji and punctuation - they carry
+    tone the transformer's tokenizer can use. It must match raw_text() in the
+    fine-tuning notebook.
+    """
+    if not isinstance(text, str):
+        return ""
+    return _WHITESPACE.sub(" ", html.unescape(text)).strip()
+
+
 def predict_sentiment(text: str) -> tuple[str, float]:
     kind, _key, model = _load_model()
+    if kind == "onnx":
+        import numpy as np
+        session, tokenizer = model
+        ids = np.array([tokenizer.encode(_raw_text(text)).ids], dtype=np.int64)
+        logits = session.run(
+            ["logits"], {"input_ids": ids, "attention_mask": np.ones_like(ids)}
+        )[0][0]
+        probs = np.exp(logits - logits.max())
+        probs /= probs.sum()
+        idx = int(probs.argmax())
+        return ID_TO_LABEL[idx], float(probs[idx])
+
     cleaned = clean_text(text)
     if kind == "keras":
         import tensorflow as tf
@@ -412,6 +493,9 @@ def analyse_review(text: str) -> PredictionResult:
         urgency_reason=reason,
         aspects=aspects,
         recommendations=recommend(aspects, urgency, sentiment),
+        # Read now, after loading: the dataclass default was frozen at import
+        # time, so without this every result was labelled "v1".
+        model_version=MODEL_VERSION,
     )
 
 

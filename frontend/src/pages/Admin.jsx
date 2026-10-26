@@ -87,7 +87,15 @@ export default function Admin() {
               <tbody>
                 {Object.entries(comparison).map(([name, scores]) => (
                   <tr key={name} className="border-b last:border-0 hairline">
-                    <td className="py-2 font-mono text-xs">{name}</td>
+                    <td className="py-2 font-mono text-xs">
+                      {name}
+                      {name === data.metrics.active_model && (
+                        <span className="ml-2 font-sans text-[10px] uppercase tracking-wide"
+                              style={{ color: 'var(--text-muted)' }}>
+                          serving
+                        </span>
+                      )}
+                    </td>
                     <td className="tabular py-2 text-right">{scores.accuracy?.toFixed(4)}</td>
                     <td className="tabular py-2 text-right font-medium">
                       {scores.macro_f1?.toFixed(4)}

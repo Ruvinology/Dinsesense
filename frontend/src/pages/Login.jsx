@@ -28,19 +28,21 @@ export default function Login() {
   }
 
   return (
-    <div className="grid min-h-screen place-items-center px-6 py-12">
+    <div className="grid min-h-screen place-items-center px-6 py-12"
+         style={{ background: 'var(--header)' }}>
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span
             className="mx-auto grid h-14 w-14 place-items-center rounded-full text-base font-bold"
-            style={{ background: 'var(--herb)', color: '#fffdf8' }}
+            style={{ background: 'var(--header-accent)', color: 'var(--header)' }}
             aria-hidden="true"
           >
             DS
           </span>
-          <h1 className="display mt-4 text-2xl font-semibold">DineSense</h1>
+          <h1 className="display mt-4 text-2xl font-semibold"
+              style={{ color: 'var(--header-ink)' }}>DineSense</h1>
           <p className="mt-1 text-xs uppercase tracking-[0.18em]"
-             style={{ color: 'var(--text-muted)' }}>
+             style={{ color: 'var(--header-muted)' }}>
             Guest Intelligence
           </p>
         </div>
@@ -63,7 +65,7 @@ export default function Login() {
           </Button>
         </form>
 
-        <p className="mt-5 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
+        <p className="mt-5 text-center text-xs" style={{ color: 'var(--header-muted)' }}>
           Demo accounts are pre-filled · admin@dinesense.ai for the admin view
         </p>
       </div>

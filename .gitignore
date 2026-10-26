@@ -32,3 +32,10 @@ env/
 .idea/
 .vscode/
 .DS_Store
+
+# Full-precision transformer (313 MB) - over GitHub's 100 MB file limit.
+# The app serves sentiment_int8.onnx instead; a backup copy is on Google Drive.
+ml/saved_models/transformer_v3/model.safetensors
+
+# Local backup copies made while editing - git history replaces them
+_backup_*/

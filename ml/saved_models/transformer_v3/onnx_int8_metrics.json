@@ -1,0 +1,34 @@
+{
+  "model": "distilroberta_finetuned_onnx_int8",
+  "model_version": "v3",
+  "description": "transformer_v3 exported to ONNX (torch.onnx.export, dynamo=True) and quantised with onnxruntime quantize_dynamic (int8 weights, per-channel). This is the file the app serves.",
+  "file": "sentiment_int8.onnx",
+  "file_size_mb": 83.1,
+  "test_accuracy": 0.8168074699866608,
+  "test_macro_f1": 0.818341306499445,
+  "per_class": {
+    "negative": {
+      "precision": 0.86028641285365,
+      "recall": 0.8212737579193065,
+      "f1-score": 0.8403275332650972,
+      "support": 2999.0
+    },
+    "neutral": {
+      "precision": 0.7125656066687249,
+      "recall": 0.7698465643762509,
+      "f1-score": 0.7400994067660734,
+      "support": 2998.0
+    },
+    "positive": {
+      "precision": 0.8904630269523152,
+      "recall": 0.8592864288096032,
+      "f1-score": 0.8745969794671644,
+      "support": 2999.0
+    }
+  },
+  "full_precision_test_macro_f1": 0.8206892470795464,
+  "max_len": 256,
+  "n_test": 8996,
+  "runtime": "onnxruntime CPU; needs only onnxruntime + tokenizers",
+  "scored_with": "tokenizers (no padding, truncation 256) + onnxruntime CPU, identical to ml/predict.py"
+}

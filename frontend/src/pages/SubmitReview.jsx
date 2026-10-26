@@ -63,7 +63,7 @@ export default function SubmitReview() {
       <div className="mx-auto max-w-md py-16 text-center">
         <div
           className="mx-auto grid h-16 w-16 place-items-center rounded-full text-2xl"
-          style={{ background: 'var(--herb)', color: '#fffdf8' }}
+          style={{ background: 'var(--herb)', color: 'var(--on-brand)' }}
           aria-hidden="true"
         >
           ✓
@@ -152,8 +152,8 @@ export default function SubmitReview() {
             minLength={5}
             placeholder="What went well? What could be better?"
             className="w-full resize-y rounded-xl border px-3.5 py-3 text-sm leading-relaxed
-                       outline-none hairline transition focus:border-[#1f4d3f]
-                       focus:ring-2 focus:ring-[#1f4d3f]/15"
+                       outline-none hairline transition focus:border-[#1d6142]
+                       focus:ring-2 focus:ring-[#1d6142]/15"
             style={{ background: 'rgba(255,255,255,0.7)' }}
           />
         </Field>

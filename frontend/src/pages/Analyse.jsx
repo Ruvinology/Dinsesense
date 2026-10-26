@@ -48,8 +48,8 @@ export default function Analyse() {
             onChange={(e) => setText(e.target.value)}
             rows={6}
             className="w-full resize-y rounded-xl border px-3.5 py-3 text-sm leading-relaxed
-                       outline-none hairline transition focus:border-[#1f4d3f]
-                       focus:ring-2 focus:ring-[#1f4d3f]/15"
+                       outline-none hairline transition focus:border-[#1d6142]
+                       focus:ring-2 focus:ring-[#1d6142]/15"
             style={{ background: 'rgba(255,255,255,0.7)' }}
             placeholder="Paste or type a customer review..."
           />

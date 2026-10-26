@@ -13,5 +13,10 @@ seaborn>=0.13
 joblib>=1.3
 pytest>=8.0
 
+# Serving the fine-tuned transformer (transformer_v3, the default model).
+# Light: no PyTorch needed. Training it happens in Colab - see notebooks/.
+onnxruntime>=1.20
+tokenizers>=0.20
+
 # Explainability (used later, in the notebooks)
 shap>=0.44

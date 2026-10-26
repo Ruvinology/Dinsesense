@@ -23,7 +23,7 @@ const NEGATIVE = '#c0392b'
 
 const axisProps = {
   stroke: 'var(--baseline)',
-  tick: { fill: '#8d7d6c', fontSize: 11 },
+  tick: { fill: '#687b6e', fontSize: 11 },
   tickLine: false,
 }
 
@@ -31,7 +31,7 @@ function TooltipBox({ title, rows }) {
   return (
     <div
       className="rounded-xl border px-3.5 py-2.5 text-xs shadow-md"
-      style={{ background: '#fffdf8', borderColor: 'rgba(36,27,18,0.12)' }}
+      style={{ background: '#ffffff', borderColor: 'rgba(21,36,27,0.12)' }}
     >
       <p className="mb-1 font-medium">{title}</p>
       {rows.map((row) => (
@@ -112,7 +112,7 @@ export function TrendChart({ data }) {
     <div>
       <ResponsiveContainer width="100%" height={260}>
         <AreaChart data={data} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-          <CartesianGrid stroke="#e6dcc9" strokeDasharray="0" vertical={false} />
+          <CartesianGrid stroke="#d9e3d6" strokeDasharray="0" vertical={false} />
           <XAxis
             dataKey="period"
             {...axisProps}
@@ -189,11 +189,11 @@ export function AspectChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={Math.max(180, rows.length * 38)}>
       <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 40, left: 8, bottom: 4 }}>
-        <CartesianGrid stroke="#e6dcc9" horizontal={false} />
+        <CartesianGrid stroke="#d9e3d6" horizontal={false} />
         <XAxis type="number" {...axisProps} allowDecimals={false} />
         <YAxis type="category" dataKey="name" {...axisProps} width={110} axisLine={false} />
         <Tooltip
-          cursor={{ fill: 'rgba(36,27,18,0.04)' }}
+          cursor={{ fill: 'rgba(21,36,27,0.04)' }}
           content={({ active, payload }) =>
             active && payload?.length ? (
               <TooltipBox
@@ -212,7 +212,7 @@ export function AspectChart({ data }) {
           }
         />
         <Bar dataKey="negative" radius={[0, 4, 4, 0]} barSize={18}
-             label={{ position: 'right', fill: '#5c4d3f', fontSize: 11 }}>
+             label={{ position: 'right', fill: '#405346', fontSize: 11 }}>
           {rows.map((row) => (
             <Cell key={row.aspect} fill={NEGATIVE} />
           ))}
@@ -238,11 +238,11 @@ export function BranchChart({ data }) {
   return (
     <ResponsiveContainer width="100%" height={Math.max(160, rows.length * 44)}>
       <BarChart data={rows} layout="vertical" margin={{ top: 4, right: 48, left: 8, bottom: 4 }}>
-        <CartesianGrid stroke="#e6dcc9" horizontal={false} />
+        <CartesianGrid stroke="#d9e3d6" horizontal={false} />
         <XAxis type="number" {...axisProps} domain={[0, 100]} unit="%" />
         <YAxis type="category" dataKey="name" {...axisProps} width={100} axisLine={false} />
         <Tooltip
-          cursor={{ fill: 'rgba(36,27,18,0.04)' }}
+          cursor={{ fill: 'rgba(21,36,27,0.04)' }}
           content={({ active, payload }) =>
             active && payload?.length ? (
               <TooltipBox
@@ -256,7 +256,7 @@ export function BranchChart({ data }) {
           }
         />
         <Bar dataKey="pct" radius={[0, 4, 4, 0]} barSize={18} fill={NEGATIVE}
-             label={{ position: 'right', formatter: (v) => `${v}%`, fill: '#5c4d3f', fontSize: 11 }} />
+             label={{ position: 'right', formatter: (v) => `${v}%`, fill: '#405346', fontSize: 11 }} />
       </BarChart>
     </ResponsiveContainer>
   )

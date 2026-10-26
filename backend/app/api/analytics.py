@@ -83,7 +83,7 @@ def model_metrics() -> ModelMetrics:
     metrics = predictor.read_metrics()
     return ModelMetrics(
         active_model=predictor.active_model_name(),
-        model_version="v1",
+        model_version=predictor.active_model_version(),
         metrics={k: v for k, v in metrics.items() if k != "comparison"},
         comparison=metrics.get("comparison"),
     )
